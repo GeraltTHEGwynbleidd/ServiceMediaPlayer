@@ -6,6 +6,8 @@
     android:padding="8dp"
     tools:context=".MainActivity">
 
+
+
     <LinearLayout
         android:id="@+id/linear_buttons"
         android:layout_width="match_parent"
@@ -19,7 +21,6 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_play_circle_filled_black_24dp"
             android:text="PLAY" />
 
         <Button
@@ -27,8 +28,21 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_pause_circle_filled_black_24dp"
             android:text="PAUSE" />
+
+        <Button
+            android:id="@+id/button_stop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="STOP" />
+
+        <Button
+            android:id="@+id/button_load"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="LOAD" />
 
     </LinearLayout>
 
@@ -36,7 +50,81 @@
         android:id="@+id/seekbar_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/linear_buttons" />
+        android:layout_above="@id/music_info_bar" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/music_info_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/linear_buttons"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/info_song_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/info_total_song_text"
+                android:layout_margin="4dp"/>
+
+            <TextView
+                android:id="@+id/info_total_song_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Songs : "
+                android:layout_alignParentTop="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_margin="4dp"/>
+
+            <TextView
+                android:id="@+id/info_total_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/info_total_song_text"
+                android:textColor="@color/colorAccent"
+                android:layout_margin="4dp"/>
+
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/music_recycler"
+        android:layout_below="@id/sort_card"
+        android:layout_above="@id/seekbar_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <androidx.cardview.widget.CardView
+        android:layout_marginBottom="8dp"
+        android:id="@+id/sort_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="Sort   "
+                android:drawableEnd="@drawable/ic_sort_black_24dp"
+                />
+
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
 
 
 </RelativeLayout>

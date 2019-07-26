@@ -1,5 +1,9 @@
 package com.gwynbleidd.servicemediaplayer;
 
+import com.gwynbleidd.servicemediaplayer.database.entity.MusicObjs;
+
+import java.util.List;
+
 public class EventsFromService {
 
     public static class StateEvent{
@@ -8,6 +12,14 @@ public class EventsFromService {
 
         public StateEvent(String currentState) {
             this.currentState = currentState;
+        }
+    }
+
+    public static class SongInfoSend{
+        public final MusicObjs musicObjs;
+
+        public SongInfoSend(MusicObjs musicObjs) {
+            this.musicObjs = musicObjs;
         }
     }
 
@@ -26,6 +38,14 @@ public class EventsFromService {
 
         public PlaybackDuration(int duration) {
             this.duration = duration;
+        }
+    }
+
+    public static class DatabaseIsUpdate {
+        public final List<MusicObjs> musicObjsList;
+
+        public DatabaseIsUpdate(List<MusicObjs> musicObjsList) {
+            this.musicObjsList = musicObjsList;
         }
     }
 
