@@ -1,9 +1,15 @@
 package com.gwynbleidd.servicemediaplayer.database;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.gwynbleidd.servicemediaplayer.BuildConfig;
+import com.gwynbleidd.servicemediaplayer.R;
 import com.gwynbleidd.servicemediaplayer.database.entity.MusicObjs;
 import com.gwynbleidd.servicemediaplayer.database.entity.MyObjectBox;
 
@@ -25,11 +31,12 @@ public class ObjectBox {
         }
     }
 
-    public static BoxStore get() { return boxStore; }
+    public static BoxStore get() {
+        return boxStore;
+    }
 
-    public static void DeleteMusic(long id){
+    public static void DeleteMusic(Context context, final String fileName, final long id) {
         boxStore.boxFor(MusicObjs.class).remove(id);
-
     }
 
 }

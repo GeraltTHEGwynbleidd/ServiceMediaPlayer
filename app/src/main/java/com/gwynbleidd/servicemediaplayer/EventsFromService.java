@@ -32,6 +32,10 @@ public class EventsFromService {
         }
     }
 
+    public static class PlaybackCompleted {
+
+    }
+
     public static class PlaybackDuration {
 
         public final int duration;

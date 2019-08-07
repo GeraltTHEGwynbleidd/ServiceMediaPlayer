@@ -6,18 +6,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gwynbleidd.servicemediaplayer.database.ObjectBox;
 import com.gwynbleidd.servicemediaplayer.database.entity.MusicObjs;
@@ -25,12 +21,11 @@ import com.gwynbleidd.servicemediaplayer.database.entity.MusicObjs_;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.Box;
-import io.objectbox.query.Query;
 import io.objectbox.query.QueryBuilder;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -44,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView musicsRecyclerView;
     Box<MusicObjs> musicObjsBox;
     MusicListAdapter musicListAdapter;
+    List<MusicObjs> musicObjsList = new ArrayList<>();
 
     String sortType = "";
     String sortOrder = "";
@@ -61,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //
-        List<MusicObjs> musicObjsList = musicObjsBox.getAll();
+        musicObjsList = musicObjsBox.getAll();
         //
         musicListAdapter = new MusicListAdapter(this);
         musicListAdapter.setMusicDataset(musicObjsList);
@@ -148,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 musicListAdapter.setMusicDataset(musicObjs);
                 break;
             case "Name_DES":
-                musicObjs = musicObjsQueryBuilder.order(MusicObjs_.musicName , QueryBuilder.DESCENDING).build().find();
+                musicObjs = musicObjsQueryBuilder.order(MusicObjs_.musicName, QueryBuilder.DESCENDING).build().find();
                 musicListAdapter.setMusicDataset(musicObjs);
                 break;
             case "Album_ASC":
@@ -265,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sortOkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sortResult = sortType+"_"+sortOrder;
+                sortResult = sortType + "_" + sortOrder;
 //                Toast.makeText(MainActivity.this, sortResult, Toast.LENGTH_SHORT).show();
                 SortSongs(sortResult);
                 sortDialog.dismiss();
@@ -324,11 +320,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playingSongInf.setText(songInfo.musicObjs.getMusicName());
     }
 
+    @Subscribe
+    public void playbackCompleteEvent(EventsFromService.PlaybackCompleted playbackCompleted) {
+        musicListAdapter.GetDataSetFromAdapter();
+//        Toast.makeText(this, "completed "+playbackCompleted.musicObjs.getMusicName(), Toast.LENGTH_SHORT).show();
+    }
+
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_play:
-                EventBus.getDefault().post(new EventsFromMainActivity.PlayEvent());
+                if (!musicObjsList.isEmpty()) {
+                    EventBus.getDefault().post(new EventsFromMainActivity.LoadSelectedFile(musicObjsList.get(0), 0));
+                }
                 break;
             case R.id.button_pause:
                 EventBus.getDefault().post(new EventsFromMainActivity.PauseEvent());

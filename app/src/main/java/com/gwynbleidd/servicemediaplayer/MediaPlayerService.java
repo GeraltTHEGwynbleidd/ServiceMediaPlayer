@@ -1,5 +1,6 @@
 package com.gwynbleidd.servicemediaplayer;
 
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import com.gwynbleidd.servicemediaplayer.database.ObjectBox;
 import com.gwynbleidd.servicemediaplayer.database.entity.MusicObjs;
@@ -22,7 +24,8 @@ import io.objectbox.Box;
 
 public class MediaPlayerService extends Service {
 
-    MediaPlayer mediaPlayer=new MediaPlayer();
+    MediaPlayer mediaPlayer = new MediaPlayer();
+    int playinPosition=0;
 
     Box<MusicObjs> musicObjsBox;
 
@@ -88,16 +91,22 @@ public class MediaPlayerService extends Service {
     }
 
     public void stop() {
-            mediaPlayer.pause();
-            seekTo(0);
-            EventBus.getDefault().post(new EventsFromService.StateEvent("stop"));
-            EventBus.getDefault().post(new EventsFromService.PlaybackPosition(0));
+        mediaPlayer.pause();
+        seekTo(0);
+        EventBus.getDefault().post(new EventsFromService.StateEvent("stop"));
+        EventBus.getDefault().post(new EventsFromService.PlaybackPosition(0));
 
     }
 
     public void load(MusicObjs musicObjs) {
         mediaPlayer.release();
-        mediaPlayer = MediaPlayer.create(this,Uri.parse(musicObjs.getMusicUrl()));
+        mediaPlayer = MediaPlayer.create(this, Uri.parse(musicObjs.getMusicUrl()));
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                EventBus.getDefault().post(new EventsFromService.PlaybackCompleted());
+            }
+        });
         EventBus.getDefault().post(new EventsFromService.PlaybackDuration(mediaPlayer.getDuration()));
         EventBus.getDefault().post(new EventsFromService.SongInfoSend(musicObjs));
         play();
@@ -109,9 +118,12 @@ public class MediaPlayerService extends Service {
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
         Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        //
+
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
+
                     String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -120,15 +132,15 @@ public class MediaPlayerService extends Service {
                     String dateModified = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
 
                     MusicObjs musicObjs = new MusicObjs();
-                    musicObjs.setMusicName(name);
+                    musicObjs.setMusicName(Uri.parse(url).getLastPathSegment());
                     musicObjs.setMusicArtist(artist);
                     musicObjs.setMusicUrl(url);
                     musicObjs.setMusicAlbum(album);
-                    musicObjs.setMusicDuration(Integer.parseInt(duration)/1000);
+
+                    musicObjs.setMusicDuration(Integer.parseInt(duration) / 1000);
                     musicObjs.setMusicDatemodified(dateModified);
 
                     musicObjsBox.put(musicObjs);
-
 
 //                    SongInfo s = new SongInfo(name, artist, url);
 //                    _songs.add(s);
@@ -194,6 +206,22 @@ public class MediaPlayerService extends Service {
     @Subscribe()
     public void onMessagePlaySelectedMusic(EventsFromMainActivity.LoadSelectedFile loadSelectedFile) {
         load(loadSelectedFile.musicObjs);
+        this.playinPosition = loadSelectedFile.position;
+    }
+
+    @Subscribe
+    public void onMessageDataSetFromAdapter(EventsFromMainActivity.DataSetFromAdapter dataSetFromAdapter){
+        if(playinPosition>=dataSetFromAdapter.musicObjsList.size()){
+            Toast.makeText(this, "The Playlist is finished", Toast.LENGTH_SHORT).show();
+        } else {
+            playinPosition++;
+            load(dataSetFromAdapter.musicObjsList.get(playinPosition));
+        }
+    }
+
+    @Subscribe
+    public void onMessageUpdatePlayinPosition(EventsFromMainActivity.UpdatePlayingposition updatePlayingposition){
+        playinPosition=updatePlayingposition.pos;
     }
 
 

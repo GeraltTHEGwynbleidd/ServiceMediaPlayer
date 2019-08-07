@@ -63,16 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="16dp"
-                android:src="@drawable/ic_remove_circle_black_24dp" />
-
-            <ImageView
-                android:id="@+id/play_selected"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_alignParentBottom="true"
-                android:src="@drawable/ic_play_circle_filled_black_24dp" />
-
+                android:src="@drawable/ic_more_vert_black_24dp" />
 
         </RelativeLayout>
 
